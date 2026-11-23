@@ -9,3 +9,21 @@
 # TODO 4: grep i liczenie wierszy ERROR dla każdego pliku.
 # TODO 5: if wyznaczający STATUS zgodnie z ZADANIA.md.
 # TODO 6: printf trzy pola oddzielone średnikami.
+
+katalog="${1:-dane}"
+if [ ! -d "$katalog" ]; then
+   echo "Blad: katalog '$katalog' nie istnieje" >&2
+   exit 2
+fi
+
+for plik in "$katalog"/*.log; do
+   [ -e "$plik" ] || continue
+   nazwa=$(basename "$plik")
+   liczba_error=$(grep -c '^ERROR;' "$plik")
+   liczba_timeout=$(grep -c '^TIMEOUT;' "$plik")
+   status="OK"
+   if [ "$liczba_timeout" -ge 2 ]; then
+    status="ALARM"
+   fi
+   echo "${nazwa};${liczba_error};${status}"
+done    
